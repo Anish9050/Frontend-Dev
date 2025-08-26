@@ -1,45 +1,23 @@
 export async function translate(text, targetLang) {
-if (!text?.trim()) throw new Error('Please enter text to translate.');
-if (!targetLang) throw new Error('Please choose a target language.');
+  if (!text?.trim()) throw new Error('Please enter text to translate.')
+  if (!targetLang) throw new Error('Please choose a target language.')
 
+  const res = await fetch('http://localhost:5174/api/translate', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ text, target: targetLang }),
+  })
 
-const url = import.meta.env.VITE_RAPIDAPI_URL;
-const apiKey = import.meta.env.VITE_RAPIDAPI_KEY;
-const host = import.meta.env.VITE_RAPIDAPI_HOST;
+  const raw = await res.text()
+  let json = {}
+  try { json = JSON.parse(raw) } catch {}
 
+  if (!res.ok) {
+    const apiMsg = json?.error || json?.message || raw || `HTTP ${res.status} ${res.statusText}`
+    throw new Error(`Translation failed: ${apiMsg}`)
+  }
 
-if (!url || !apiKey || !host) {
-throw new Error('RapidAPI environment variables are missing. Check .env.local');
-}
-
-
-const body = new URLSearchParams({
-source_language: 'en',
-target_language: targetLang,
-text,
-});
-
-
-const res = await fetch(url, {
-method: 'POST',
-headers: {
-'content-type': 'application/x-www-form-urlencoded',
-'X-RapidAPI-Key': apiKey,
-'X-RapidAPI-Host': host,
-},
-body,
-});
-
-
-if (!res.ok) {
-const msg = `HTTP ${res.status} — ${res.statusText}`;
-throw new Error(`Translation failed: ${msg}`);
-}
-
-
-const json = await res.json();
-// Expected shape: { data: { translatedText: '...' } }
-const out = json?.data?.translatedText || json?.translatedText || json?.data || '';
-if (!out) throw new Error('No translated text returned by API.');
-return out;
+  const out = json?.data?.translatedText || json?.translatedText || json?.data || ''
+  if (!out) throw new Error(`No translated text returned. Response: ${raw.slice(0, 200)}...`)
+  return out
 }

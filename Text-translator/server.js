@@ -1,9 +1,7 @@
-// server.js
 import express from 'express'
 import fetch from 'node-fetch'
 import cors from 'cors'
 import dotenv from 'dotenv'
-
 dotenv.config({ path: '.env.local' })
 
 const app = express()
@@ -37,14 +35,12 @@ app.post('/api/translate', async (req, res) => {
     const raw = await r.text()
     let json = {}
     try { json = JSON.parse(raw) } catch {}
-    if (!r.ok) {
-      return res.status(r.status).json({ error: json?.message || raw })
-    }
+
+    if (!r.ok) return res.status(r.status).json({ error: json?.message || raw })
     res.json(json)
   } catch (e) {
     res.status(500).json({ error: e.message })
   }
 })
 
-const PORT = 5174
-app.listen(PORT, () => console.log(`Proxy on http://localhost:${PORT}`))
+app.listen(5174, () => console.log('Proxy on http://localhost:5174'))
