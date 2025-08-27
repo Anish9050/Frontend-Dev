@@ -1,4 +1,4 @@
-// src/App.jsx
+
 import { useEffect, useState } from 'react'
 import { translate } from './lib/translate'
 import { LANGUAGES } from './lib/languages'
@@ -10,8 +10,6 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // 🔎 Quick sanity check for Option 1 (direct browser call)
-  // Remove these logs after you confirm they print correct values.
   useEffect(() => {
     console.log('has key?', Boolean(import.meta.env.VITE_RAPIDAPI_KEY))
     console.log('host:', import.meta.env.VITE_RAPIDAPI_HOST)
